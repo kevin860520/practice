@@ -1,0 +1,176 @@
+#include<stdio.h>
+void Sudoku();
+int Sudoku_test(char [][9],int);
+int test_row(char [][9],int);
+int test_column(char [][9],int);
+int test_square(char [][9],int);
+
+int main(void){
+    Sudoku();
+}
+
+void Sudoku(){
+    //N is the number for sudoku 0~80(9*9),Q =1 if it is question.Q = 0 if it is not.
+    int i, j, k, z, N, Q[81]={0}, count1, B, C;
+    char arr[9][9], a;
+
+
+    k = 0;
+
+
+    for ( i = 0; i < 9; i++){                           //scanf question.
+        for ( j = 0; j < 9; ){
+             scanf("%c", &a);
+            if(a!=' '){
+                arr[i][j] = a;
+                j++;
+            }
+        }
+    }
+
+    for ( i = 0; i < 9; i++){                           //printf question and trun '.' to '0'
+        for ( j = 0; j < 9; j++ ){
+             if(arr[i][j]!='.'){                        //record Q=1 if it is question and unchangeable
+                Q[k] = 1;
+             }
+             else{
+                arr[i][j] = '0';                        //Q = 0 it is not question and changeable
+                Q[k] = 0;
+             }
+             printf("%c  ", arr[i][j]);
+             k++;
+        }
+        printf("\n");
+    }
+    printf("\n");
+
+
+    for(N = 0, count1 = 0 ; N < 81; ){
+        for( ; N < 81 ; ){
+            i = N/9;                                    // turn N to [i][j]
+            j = N%9;
+
+            if((Q[N] == 1) & (count1 == 0)){            //it is question and unchangeable.count1=0 forward.
+                N++;
+                break;
+            }
+            else if((Q[N] == 1) & (count1 == 1)){       //it is question and unchangeable.count1=1 backward.
+                N--;
+                break;
+            }
+            //backward and [i][j]=9 ,we have to cahange previous number
+            if((count1 == 1) & (arr[i][j] == '9')){
+                arr[i][j] = '0';
+                N--;
+                break;
+            }
+            else{
+                arr[i][j]++;
+            }
+
+            B = Sudoku_test(arr, N);
+
+            //not qualify sudoku rule and [i][j]=9.we have to change previous number
+            if(!(B) & (arr[i][j] == '9')){
+                arr[i][j] = '0';                        //reset it to '0'
+                count1 = 1;                             //record we are going back
+                N--;
+            }
+            else if(B){                       //qualify sudoku rule
+                N++;                                    //next
+                count1 = 0;                             //record we are going forward
+            }
+            else{                                       //not qualify and [i][j]=1~8
+                count1 = 0;                             // N=N, test next number
+            }
+        }
+    }
+    for ( i = 0 ; i < 9 ; i++ ){                           //printf answer
+        for ( j = 0 ; j < 9 ; j++ ){
+             printf("%c  ", arr[i][j]);
+        }
+        printf("\n");
+    }
+
+}
+int Sudoku_test(char arr[][9], int N){
+
+    if(test_row(arr, N)){
+        if(test_column(arr, N)){
+            if(test_square(arr, N)){
+                return 1;
+            }
+        }
+    }
+    else{
+        return 0;
+    }
+}
+int test_row(char arr[][9], int N){
+
+    int count2, i, j, z, k;
+
+    i = N/9;                                    // turn N to [i][j]
+    j = N%9;
+
+    //test number if it is qualify the sudoku rule,if it qualify count2 = 1
+    for(z = i, k = 0, count2 = 0 ; k < 9; k++){
+        if(arr[i][j] == arr[z][k]){             //test row
+            count2++;
+    }
+        }
+    if(count2 == 1){
+        return count2;
+    }
+    else{
+        return 0;
+    }
+}
+int test_column(char arr[][9],int N){
+
+    int count2, i, j, z, k;
+
+    i = N/9;                                    // turn N to [i][j]
+    j = N%9;
+
+    //test number if it is qualify the sudoku rule,if it qualify count2 = 1
+    for(z = 0, k = j, count2 = 0 ; z < 9; z++){
+        if(arr[i][j] == arr[z][k]){             //test column
+            count2++;
+    }
+        }
+    if(count2 == 1){
+        return count2;
+    }
+    else{
+        return 0;
+    }
+}
+int test_square(char arr[][9], int N){
+
+    int count2, i, j, z, k, B, C;
+
+    i = N/9;                                    // turn N to [i][j]
+    j = N%9;
+
+    for(z = 0, k = 0, count2 = 0 ; z < 3 ; z++){     //test 3X3
+        B = i/3;
+        C = j/3;
+        if(arr[i][j] == arr[3*B+z][3*C]){
+            count2++;
+        }
+        if(arr[i][j] == arr[3*B+z][3*C+1]){
+            count2++;
+        }
+        if(arr[i][j] == arr[3*B+z][3*C+2]){
+            count2++;
+        }
+    }
+    if(count2 == 1){
+        return count2;
+    }
+    else{
+        return 0;
+    }
+}
+
